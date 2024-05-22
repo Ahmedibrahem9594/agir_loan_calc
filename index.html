@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>حاسبة القروض - البنك الزراعي المصري</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f8f8f8;
+      }
+
+      h1 {
+        text-align: center;
+        margin-top: 20px;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .form-container {
+        margin-bottom: 20px;
+      }
+      form {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+      }
+
+      label {
+        width: 100%;
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+
+      input[type="text"],
+      input[type="number"],
+      input[type="date"],
+      select {
+        width: 100%; /* Full width on small screens */
+        padding: 8px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+      }
+
+      select {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 10 6' fill='%23333'%3E%3Cpath d='M5 0L0 6h10L5 0z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 10px 6px;
+        padding-right: 25px;
+      }
+
+      button {
+        width: 100%; /* Full width on small screens */
+        padding: 10px 20px;
+        border: none;
+        background-color: #007bff;
+        color: #fff;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      .summary-container {
+        text-align: center;
+      }
+
+      .summary-container h2 {
+        margin-top: 20px;
+      }
+
+      .summary-container p {
+        font-size: 16px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+      }
+
+      th,
+      td {
+        border: 1px solid #ccc;
+        padding: 8px;
+        text-align: center;
+        font-size: 14px; /* Adjust font size for smaller screens */
+      }
+
+      th {
+        background-color: #f2f2f2;
+      }
+
+      /* Media query for screens smaller than 600px (typical mobile devices) */
+      @media screen and (max-width: 600px) {
+        table,
+        th,
+        td {
+          font-size: 12px; /* Adjust font size for smaller screens */
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div style="display: flex; justify-content: center; align-items: center;">
+        <img src="agri_logo.png" style="width:400px;">
+    </div>
+    <h2 style="text-align: center;">حاسبة القروض البنك الزراعي المصري</h2>
+    <div class="container">
+      <div class="form-container">
+        <form id="loan-form">
+          <label for="customer-name">اسم العميل</label>
+          <input type="text" id="customer-name" required /><br /><br />
+
+          <label for="start-date">التاريخ</label>
+          <input type="date" id="start-date" required /><br /><br />
+
+          <label for="loan-amount">قيمة القرض</label>
+          <input type="number" id="loan-amount" required /><br /><br />
+
+          <label for="annual-interest-rate">قيمة الفائدة</label>
+          <input
+            type="number"
+            step="0.01"
+            id="annual-interest-rate"
+            required
+          /><br /><br />
+
+          <label for="loan-term"> مدة القرض <span>(سنوي)</span> </label>
+          <input type="number" id="loan-term" required /><br /><br />
+
+          <label for="payment-frequency">نوع القسط</label>
+          <select id="payment-frequency" required>
+            <option value="1">سنوي</option>
+            <option value="12">شهري</option>
+            <option value="52">اسبوعي</option></select
+          ><br /><br />
+
+          <label for="expense-percentage">قيمة المصاريف الادارية</label>
+          <input
+            type="number"
+            step="0.01"
+            id="expense-percentage"
+            required
+          /><br /><br />
+
+          <button type="button" onclick="calculateAmortization()">
+            احتساب
+          </button>
+          <button type="button" onclick="exportToPDF()"> حفظ الجدول</button>
+        </form>
+      </div>
+      <div class="summary-container">
+        <h2>ملخص المصاريف الادارية</h2>
+        <p id="expense-summary"></p>
+      </div>
+      <div>
+        <h2>جدول الاقساط</h2>
+        <table id="amortization-schedule">
+          <thead>
+            <tr>
+              <th>رقم القسط #</th>
+              <th>تاريخ القسط</th>
+              <th>قيمة القسط</th>
+              <th>اصل</th>
+              <th>فائدة</th>
+              <th>رصيد</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+    <footer style="text-align: center;margin-top: 5px; position: static;">
+        <div> MADE WITH ❤️ BY AHMED IBRAHEM</div>
+        <div>VERSION 1.0.0</div>
+    </footer>
+    <script src="jspdf.umd.min.js"></script>
+    <script src="jspdf.plugin.autotable.min.js"></script>
+    <script src="amortization.js"></script>
+  </body>
+</html>
